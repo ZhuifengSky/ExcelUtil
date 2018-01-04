@@ -1,0 +1,35 @@
+body {
+	margin: 0 auto;
+	background-color: #EEEEEE;
+	font-family: "raleway-regular", arial;
+	font-size: 14px;
+}
+
+#container {
+	margin: 0 auto;
+	background-color: white;
+	width: 95%;
+	height: 100%;
+}
+
+.demobar {
+	height: 90px;
+	line-height: 90px;
+}
+
+.demobar .fleft {
+	float: left;
+	margin-left: 10px;
+}
+
+.demobar .fright {
+	float: right;
+	margin-top: 14px;
+	margin-right: 10px;
+}
+
+#demo-side-bar {
+	position: absolute;
+	top: 90px;
+	display: none;
+}

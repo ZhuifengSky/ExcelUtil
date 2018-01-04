@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>DNS工具</title>
+<link rel="stylesheet" type="text/css"
+	href="static/css/index.css">
+<script type="text/javascript"
+	src="static/js/jquery-3.2.1.min.js"></script>
+<link rel="stylesheet" type="text/css"
+	href="static/css/demo.css">
+<link rel="stylesheet" type="text/css"
+	href="static/css/searchMeme.css">
+<script type="text/javascript">
+	$(document).ready(function(){
+		$("#find").click(function(){
+			var ip=$("#search-green").val();
+			 var reg =  /^(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$/     
+			 if(ip!=null && ip!=''){
+				if(reg.test(ip)){
+					$.ajax({
+				    	url:"dnsInfo/getDnsInfoByIp",
+				        type:"GET",
+				        dataType:'json',
+				        data: "ip="+ip, 
+				        success:function(result){
+				        	if (result!= null) {
+				        		if (result.code!='000' && result.success=="true") {
+				  	        	  // alert(result.info);
+				  			    }else{
+				  			    	var dataObj = eval(result.data);// 转换为json对象
+									var resultLists = "";
+									// 遍历json数组
+									$.each(dataObj, function(i, item) {
+										resultLists+= "<tr><td>"+item.id+"</td><td>"+item.host+"</td><td>"+item.zone+"</td><td>"+item.type+"</td><td>"+item.view+"</td><td>"+item.record+"</td><td>"+item.ttl+"</td><td>"+item.status+"</td><td>"+item.view_description+"</td></tr>";
+									});
+			                       $("#finalResult").html(resultLists);
+				  			    }  	        		
+							} else {
+								alert("请求失败!")
+							}	              	
+				        },
+				        error:function(e){
+				          alert("发生错误！！");
+				        } 
+				      });	 
+				}else{
+					alert("IP地址非法!") ;
+				} 
+			 }else{
+				 alert("IP地址不能为空!"); 
+			 }	    		
+			 
+		});
+		
+		$("#exportExcelFile").click(function(){
+			var ip=$("#search-green").val();
+			 var reg =  /^(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$/     
+			 if(ip!=null && ip!=''){
+				if(reg.test(ip)){
+					$("#exportExcelFile").attr("href","dnsInfo/exportExcel?ip="+ip); 
+				}else{
+					alert("IP地址非法!") ;
+				} 
+			 }else{
+				 alert("IP地址不能为空!"); 
+			 }	    		
+			 
+		});
+		
+		
+	});
+</script>
+</head>
+<body>
+	<div id="container">
+		<div class="demo">
+			<div class="wrapper-green">
+				<div class="searchMeme-button-right green-normal  searchMeme-round-right" id="find">
+					<div class="searchMeme-button-icon searchMeme-button-inner"></div>
+				</div>
+				<div class="searchMeme-input-right">
+					<input type="text" id="search-green" class="searchMeme-water-mark" placeholder="请输入要搜索的IP地址" style="margin-left: 20px;">
+				</div>
+			</div>
+			<div class="clear"></div>
+		</div>
+		<hr>
+		<div class="result" id="search-results">
+		     <div id="exportExcelArea">
+				   <a id="exportExcelFile" href="#" style="float: left;margin-bottom: 10px;background-color: beige;height: 40px;margin-left: 10px;background-color: #a7a736;">导出Excel</a>
+			 </div>
+			 <div id="upDnsArea">
+				   <a id="upDns" href="upDnsInfo.html" style="float: right;margin-bottom: 10px;background-color: beige;height: 40px;margin-right: 15px;background-color: #d48426;">修改域名配置</a>
+			 </div>
+		     <table border="1px;" cellspacing="0" cellpadding="0" style="margin:0 auto; width: 100%;text-align: center;">
+		        <thead>
+		            <tr>
+		              <th>id</th>
+		              <th>host</th>
+		              <th>zone</th>
+		              <th>type</th>
+		              <th>view</th>
+		              <th>record</th>
+		              <th>ttl</th>
+		              <th>status</th>
+		              <th>view_description</th>
+		            </tr>
+		        </thead>
+		        <tbody id="finalResult">
+		            
+		        </tbody>
+		     </table>
+		</div>
+	</div>
+</body>
+</html>

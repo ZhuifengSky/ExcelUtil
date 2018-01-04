@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:task="http://www.springframework.org/schema/task"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/tx 
+           http://www.springframework.org/schema/tx/spring-tx.xsd
+            http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context.xsd
+           http://www.springframework.org/schema/aop 
+           http://www.springframework.org/schema/aop/spring-aop.xsd
+           http://www.springframework.org/schema/task
+           http://www.springframework.org/schema/task/spring-task.xsd">
+	<tx:annotation-driven />   <!--启用注解事务 -->
+	<task:annotation-driven /> <!--启用注解任务  -->
+	<context:annotation-config />
+	
+	<!--扫描指定包，与注解搭配使用  -->
+	<context:component-scan base-package="com.main.*" />
+	<bean id="propertyConfigurer"
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="locations">
+			<list>
+				<value>classpath:com/config/jdbc.properties</value>
+				<value>classpath:com/config/log4j.properties</value>
+			</list>
+		</property>
+	</bean>
+	
+	<!--定义数据源  -->
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource"
+		destroy-method="close">
+		<property name="driverClassName" value="${jdbc.driverClassName}" />
+		<property name="url" value="${jdbc.url}" />
+		<property name="username" value="${jdbc.username}" />
+		<property name="password" value="${jdbc.password}" />
+	</bean>
+	
+	<!-- 声明事务 -->	
+	<bean id="txManager"
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+	
+	<!--定义sqlSessionFactory -->	
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="configLocation" value="classpath:com/config/mybatis_config.xml"></property>  
+	</bean>
+	<!-- 定义Mapper文件的扫描位置或者直接引用Mybatis的配置文件，在Mybitis的配置文件中配置 -->
+	<!-- <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<property name="basePackage" value="com.geloin.spring.mapper" />
+	</bean> -->
+	<!-- 定义事务开启的方法 -->
+	<tx:advice id="txAdvice" transaction-manager="txManager">
+		<tx:attributes>
+			<tx:method name="load*" read-only="true" rollback-for="Exception" />
+			<tx:method name="add*" propagation="REQUIRED" rollback-for="Exception" />
+			<tx:method name="save*" propagation="REQUIRED"
+				rollback-for="Exception" />
+			<tx:method name="del*" propagation="REQUIRED" rollback-for="Exception" />
+			<tx:method name="update*" propagation="REQUIRED"
+				rollback-for="Exception" />
+			<tx:method name="get*" read-only="true" rollback-for="Exception" />
+			<tx:method name="find*" read-only="true" rollback-for="Exception" />
+		</tx:attributes>
+	</tx:advice>
+	<!-- 事务层级的声明 -->
+	<aop:config>
+		<aop:pointcut id="BussessServiceOperation"
+			expression="execution(public * *..service..*.*(..))" />
+		<aop:advisor advice-ref="txAdvice" pointcut-ref="BussessServiceOperation" />
+	</aop:config>
+</beans>

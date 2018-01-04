@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>DNS工具</title>
+<script type="text/javascript"
+	src="static/js/jquery-3.2.1.min.js"></script>
+	<script type="text/javascript"
+	src="static/js/json/json_parse.js"></script>
+	<script type="text/javascript"
+	src="static/js/jquery.form.js"></script>
+<link rel="stylesheet" type="text/css" href="static/css/upDns.css">
+<script type="text/javascript">
+	$(document).ready(function(){
+		$("#subCom").click(function(){
+			alert("开始执行dns更新！");
+			var remark=$("#remark").val();
+				if(remark!=null && remark!=''){
+					 $("#DnsForm").ajaxSubmit(function(result){
+						 if (result!= null) {
+				        		if (result.code!='1000') {
+				  	        	    alert(result.msg);
+				  			    }else{
+				  			    	var dataObj = eval(result.data);// 转换为json对象
+									var resultLists = "";
+									// 遍历json数组
+									$.each(dataObj, function(i, item) {
+										resultLists+= "<tr><td>"+item.id+"</td><td>"+item.host+"</td><td>"+item.zone+"</td><td>"+item.type+"</td><td>"+item.view+"</td><td>"+item.record+"</td><td>"+item.ttl+"</td><td>"+item.status+"</td><td>"+item.view_description+"</td><td>"+item.targetIp+"</td><td>"+item.dealStatus+"</td></tr>";
+									});
+			                       $("#finalResult").html(resultLists);
+				  			    }  	        		
+							} else {
+								alert("请求失败!")
+							}	   
+			       });        
+				}else{
+					alert("备注不能为空！") ;
+				}     		
+			 
+		});	
+	});
+</script>
+</head>
+<body>
+	<div id="container">
+	   <div class="elegant-aero">
+		<form action="dnsInfo/UpDnsInfo" method="post" id="DnsForm" class="STYLE-NAME" enctype="multipart/form-data">
+			<h1>
+				域名修改<span style="color: red;">注意：修改接口为全量覆盖，我们根据修改的内容，将原域名的配置完整覆盖</span>
+			</h1>
+			<label> <span>模板文件 :</span> <input id="dnsFile" type="file"
+				name="file" placeholder="包含要修改的DNS的模板文件" />
+			<p><a href="index.html">没有模板文件？根据IP查询导出</a></p>
+			</label>
+			<label> <span>备注信息 :</span> <textarea id="remark"
+					name="remark" placeholder="此次修改的备注信息"></textarea>
+			</label><label> <span>&nbsp;</span> <input type="button" id="subCom"
+				class="button" value="开始修改" />
+			</label>
+		</form>
+		</div>
+		<hr>
+		<h3>修改结果</h3>
+		<hr>
+		<table border="1px;" cellspacing="0" cellpadding="0" style="margin:0 auto; width: 100%;text-align: center;margin-top: 20px;">
+		        <thead>
+		            <tr>
+		              <th>id</th>
+		              <th>host</th>
+		              <th>zone</th>
+		              <th>type</th>
+		              <th>view</th>
+		              <th>record[源IP地址]</th>
+		              <th>ttl</th>
+		              <th>status</th>
+		              <th>view_description</th>
+		              <th>目标IP地址</th>
+		              <th>修改结果</th>
+		            </tr>
+		        </thead>
+		        <tbody id="finalResult">
+		            
+		        </tbody>
+		     </table>
+	</div>
+</body>
+</html>
